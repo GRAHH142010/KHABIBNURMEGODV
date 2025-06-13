@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: dps-event-notifier
+    runtime: node
+    region: oregon
+    plan: starter
+    buildCommand: |
+      echo "Starting Render build process..."
+      cp package-render.json package.json
+      npm ci --only=production
+      npm run build
+      echo "Build outputs:"
+      ls -la dist/
+      echo "Build completed successfully"
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: false
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        generateValue: true
+      - key: DPS_USERNAME
+        sync: false
+      - key: DPS_PASSWORD
+        sync: false  
+      - key: GMAIL_EMAIL
+        sync: false
+      - key: GMAIL_APP_PASSWORD
+        sync: false
+    scaling:
+      minInstances: 1
+      maxInstances: 1
